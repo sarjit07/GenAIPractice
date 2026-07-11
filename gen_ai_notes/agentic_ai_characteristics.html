@@ -1,0 +1,366 @@
+<title>Key Characteristics of Agentic AI</title>
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --border:         rgba(11,11,11,0.10);
+    --gridline:       #e1e0d9;
+
+    --s1: #2a78d6; /* blue      – autonomy */
+    --s2: #1baf7a; /* aqua      – planning */
+    --s3: #eda100; /* yellow    – tool use */
+    --s4: #008300; /* green     – feedback loop */
+    --s5: #4a3aa7; /* violet    – memory */
+    --s6: #e34948; /* red       – multi-step */
+    --s7: #e87ba4; /* magenta   – self-correction */
+    --s8: #eb6834; /* orange    – guardrails */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --border:         rgba(255,255,255,0.10);
+      --gridline:       #2c2c2a;
+
+      --s1: #3987e5;
+      --s2: #199e70;
+      --s3: #c98500;
+      --s4: #008300;
+      --s5: #9085e9;
+      --s6: #e66767;
+      --s7: #d55181;
+      --s8: #d95926;
+    }
+  }
+  :root[data-theme="light"] {
+    --surface-1: #fcfcfb; --page:#f9f9f7; --text-primary:#0b0b0b; --text-secondary:#52514e;
+    --text-muted:#898781; --border:rgba(11,11,11,0.10); --gridline:#e1e0d9;
+    --s1:#2a78d6; --s2:#1baf7a; --s3:#eda100; --s4:#008300; --s5:#4a3aa7; --s6:#e34948; --s7:#e87ba4; --s8:#eb6834;
+  }
+  :root[data-theme="dark"] {
+    --surface-1:#1a1a19; --page:#0d0d0d; --text-primary:#ffffff; --text-secondary:#c3c2b7;
+    --text-muted:#898781; --border:rgba(255,255,255,0.10); --gridline:#2c2c2a;
+    --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s4:#008300; --s5:#9085e9; --s6:#e66767; --s7:#d55181; --s8:#d95926;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--text-primary);
+  }
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 40px 24px 64px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin: 0 0 32px;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+
+  .diagram-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 40px;
+    overflow-x: auto;
+  }
+  .diagram-card svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+  .node-label {
+    font-size: 14px;
+    font-weight: 600;
+    fill: var(--text-primary);
+  }
+  .node-num {
+    font-size: 20px;
+    font-weight: 700;
+    fill: #fff;
+  }
+  .center-label {
+    font-size: 17px;
+    font-weight: 700;
+    fill: var(--text-primary);
+  }
+  .center-sub {
+    font-size: 11.5px;
+    fill: var(--text-secondary);
+  }
+  .spoke { stroke: var(--gridline); stroke-width: 2; }
+
+  section h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin: 0 0 16px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 14px;
+  }
+  .badge {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+  }
+  .card h3 {
+    margin: 4px 0 4px;
+    font-size: 15.5px;
+    font-weight: 700;
+  }
+  .card p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gridline);
+  }
+  th {
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.yes { color: var(--s4); font-weight: 600; }
+  td.no { color: var(--text-muted); }
+  .row-label { font-weight: 600; color: var(--text-primary); }
+
+  .table-wrap { overflow-x: auto; }
+</style>
+
+<div class="wrap">
+  <h1>Key Characteristics of Agentic AI</h1>
+  <p class="subtitle">
+    What separates an <strong>agent</strong> from a single LLM call: it acts, observes
+    the result, and decides its own next step toward a goal — repeating the loop
+    until the goal is met.
+  </p>
+
+  <div class="diagram-card">
+    <svg viewBox="0 0 600 600" role="img" aria-labelledby="diagram-title">
+      <title id="diagram-title">Radial diagram of eight characteristics of agentic AI around a central agent loop</title>
+
+      <!-- spokes -->
+      <line class="spoke" x1="300" y1="300" x2="300" y2="126"/>
+      <line class="spoke" x1="300" y1="300" x2="455.6" y2="144.4"/>
+      <line class="spoke" x1="300" y1="300" x2="474" y2="300"/>
+      <line class="spoke" x1="300" y1="300" x2="455.6" y2="455.6"/>
+      <line class="spoke" x1="300" y1="300" x2="300" y2="474"/>
+      <line class="spoke" x1="300" y1="300" x2="144.4" y2="455.6"/>
+      <line class="spoke" x1="300" y1="300" x2="126" y2="300"/>
+      <line class="spoke" x1="300" y1="300" x2="144.4" y2="144.4"/>
+
+      <!-- center -->
+      <circle cx="300" cy="300" r="86" fill="var(--surface-1)" stroke="var(--gridline)" stroke-width="2"/>
+      <text x="300" y="294" text-anchor="middle" class="center-label">AGENTIC AI</text>
+      <text x="300" y="314" text-anchor="middle" class="center-sub">reason → act → observe</text>
+
+      <!-- node 1: Autonomy (top) -->
+      <circle cx="300" cy="80" r="46" fill="var(--s1)"/>
+      <text x="300" y="87" text-anchor="middle" class="node-num">1</text>
+      <text x="300" y="150" text-anchor="middle" class="node-label">Autonomy</text>
+
+      <!-- node 2: Planning (top-right) -->
+      <circle cx="455.6" cy="144.4" r="46" fill="var(--s2)"/>
+      <text x="455.6" y="151.4" text-anchor="middle" class="node-num">2</text>
+      <text x="455.6" y="214.4" text-anchor="middle" class="node-label">Planning</text>
+
+      <!-- node 3: Tool Use (right) -->
+      <circle cx="520" cy="300" r="46" fill="var(--s3)"/>
+      <text x="520" y="307" text-anchor="middle" class="node-num">3</text>
+      <text x="520" y="370" text-anchor="middle" class="node-label">Tool Use</text>
+
+      <!-- node 4: Feedback Loop (bottom-right) -->
+      <circle cx="455.6" cy="455.6" r="46" fill="var(--s4)"/>
+      <text x="455.6" y="462.6" text-anchor="middle" class="node-num">4</text>
+      <text x="455.6" y="525.6" text-anchor="middle" class="node-label">Feedback Loop</text>
+
+      <!-- node 5: Memory (bottom) -->
+      <circle cx="300" cy="520" r="46" fill="var(--s5)"/>
+      <text x="300" y="527" text-anchor="middle" class="node-num">5</text>
+      <text x="300" y="590" text-anchor="middle" class="node-label">Memory</text>
+
+      <!-- node 6: Multi-step (bottom-left) -->
+      <circle cx="144.4" cy="455.6" r="46" fill="var(--s6)"/>
+      <text x="144.4" y="462.6" text-anchor="middle" class="node-num">6</text>
+      <text x="144.4" y="525.6" text-anchor="middle" class="node-label">Multi-step</text>
+
+      <!-- node 7: Self-Correction (left) -->
+      <circle cx="80" cy="300" r="46" fill="var(--s7)"/>
+      <text x="80" y="307" text-anchor="middle" class="node-num">7</text>
+      <text x="80" y="370" text-anchor="middle" class="node-label">Self-Correction</text>
+
+      <!-- node 8: Guardrails (top-left) -->
+      <circle cx="144.4" cy="144.4" r="46" fill="var(--s8)"/>
+      <text x="144.4" y="151.4" text-anchor="middle" class="node-num">8</text>
+      <text x="144.4" y="214.4" text-anchor="middle" class="node-label">Guardrails</text>
+    </svg>
+  </div>
+
+  <section>
+    <h2>What each one means</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="badge" style="background: var(--s1);">1</div>
+        <div>
+          <h3>Autonomy</h3>
+          <p>Given a goal, it decides what to do next — without a human specifying each step.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="badge" style="background: var(--s2);">2</div>
+        <div>
+          <h3>Goal-directed planning</h3>
+          <p>Decomposes a high-level objective into sub-tasks, and re-plans as it learns new information.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="badge" style="background: var(--s3);">3</div>
+        <div>
+          <h3>Tool use / action-taking</h3>
+          <p>Acts on the world — calls APIs, runs code, browses, writes files — not just generates text.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="badge" style="background: var(--s4);">4</div>
+        <div>
+          <h3>Observation &amp; feedback loop</h3>
+          <p>Reads each action's result back into context and adjusts — the core of Reason → Act → Observe.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="badge" style="background: var(--s5);">5</div>
+        <div>
+          <h3>Persistent memory</h3>
+          <p>Tracks progress across many steps, managing what stays in context vs. gets summarized or dropped.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="badge" style="background: var(--s6);">6</div>
+        <div>
+          <h3>Iterative, multi-step execution</h3>
+          <p>Unlike one chatbot turn, a task can run dozens of steps before producing a final result.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="badge" style="background: var(--s7);">7</div>
+        <div>
+          <h3>Self-correction</h3>
+          <p>Notices a failed action or wrong turn and recovers — retry, backtrack, ask for help — instead of failing silently.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="badge" style="background: var(--s8);">8</div>
+        <div>
+          <h3>Bounded autonomy (guardrails)</h3>
+          <p>Operates within permissions, tool scopes, and max-steps — full unconstrained autonomy is a reliability/safety risk.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Agent vs. chatbot vs. plain LLM call</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Plain LLM call</th>
+            <th>Chatbot</th>
+            <th>Agent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label">Turns</td>
+            <td>One prompt → one response</td>
+            <td>Multi-turn conversation</td>
+            <td>Multi-step task execution</td>
+          </tr>
+          <tr>
+            <td class="row-label">Acts on the world?</td>
+            <td class="no">No</td>
+            <td class="no">No (usually)</td>
+            <td class="yes">Yes — tools, APIs, code</td>
+          </tr>
+          <tr>
+            <td class="row-label">Decides next step?</td>
+            <td class="no">No — human decides</td>
+            <td class="no">Partially — human drives</td>
+            <td class="yes">Yes — model drives</td>
+          </tr>
+          <tr>
+            <td class="row-label">Memory of its own actions?</td>
+            <td class="no">No</td>
+            <td>Conversation history only</td>
+            <td class="yes">Tracks actions + observations</td>
+          </tr>
+          <tr>
+            <td class="row-label">Stops when?</td>
+            <td>After one response</td>
+            <td>After one reply</td>
+            <td>Goal met or max steps hit</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
