@@ -66,66 +66,35 @@ graph TD
 
 ## Key Components of an Agentic AI System
 
-<svg viewBox="0 0 720 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="components-title">
-  <title id="components-title">Architecture diagram of the key components of an agentic AI system</title>
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#898781"/>
-    </marker>
-  </defs>
+```mermaid
+graph TD
+    subgraph Guardrails["Guardrails — permissions · scopes · max-steps"]
+        T["Tool / Action Layer<br/>APIs · code exec · search · files"]
+    end
 
-  <rect x="1" y="1" width="718" height="778" rx="16" fill="#fcfcfb" stroke="#e1e0d9" stroke-width="2"/>
+    U["User / Goal"] --> A["Agent Core (LLM)<br/>Reasoning & decision-making"]
+    A <--> M["Memory<br/>Short-term + long-term"]
+    A --> P["Planner<br/>Task decomposition & strategy"]
+    P --> T
+    T --> E["Environment<br/>External world: web, DB, filesystem"]
+    E -. "Observation / feedback" .-> A
 
-  <!-- User / Goal -->
-  <rect x="260" y="24" width="200" height="56" rx="10" fill="#e1e0d9"/>
-  <text x="360" y="58" text-anchor="middle" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="#0b0b0b">User / Goal</text>
+    classDef core fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef planner fill:#1baf7a,color:#0b0b0b,stroke:#128a5e,stroke-width:1px;
+    classDef memory fill:#eda100,color:#0b0b0b,stroke:#a87400,stroke-width:1px;
+    classDef tool fill:#008300,color:#fff,stroke:#005c00,stroke-width:1px;
+    classDef env fill:#4a3aa7,color:#fff,stroke:#332876,stroke-width:1px;
+    classDef userNode fill:#e1e0d9,color:#0b0b0b,stroke:#c3c2b7,stroke-width:1px;
 
-  <line x1="360" y1="80" x2="360" y2="110" stroke="#898781" stroke-width="2" marker-end="url(#arrow)"/>
+    class U userNode;
+    class A core;
+    class P planner;
+    class M memory;
+    class T tool;
+    class E env;
 
-  <!-- Agent Core -->
-  <rect x="210" y="112" width="300" height="90" rx="12" fill="#2a78d6"/>
-  <text x="360" y="150" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#ffffff">Agent Core (LLM)</text>
-  <text x="360" y="172" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#ffffff">Reasoning &amp; decision-making</text>
-
-  <!-- Memory, bidirectional link to Agent Core -->
-  <rect x="550" y="120" width="150" height="76" rx="12" fill="#eda100"/>
-  <text x="625" y="152" text-anchor="middle" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="#0b0b0b">Memory</text>
-  <text x="625" y="170" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#0b0b0b">Short-term + long-term</text>
-  <line x1="510" y1="157" x2="550" y2="157" stroke="#898781" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
-
-  <line x1="360" y1="202" x2="360" y2="228" stroke="#898781" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- Planner -->
-  <rect x="260" y="230" width="200" height="70" rx="12" fill="#1baf7a"/>
-  <text x="360" y="260" text-anchor="middle" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="#0b0b0b">Planner</text>
-  <text x="360" y="279" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#0b0b0b">Task decomposition &amp; strategy</text>
-
-  <line x1="360" y1="300" x2="360" y2="370" stroke="#898781" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- Guardrails wrapper (dashed, encloses Tool layer) -->
-  <rect x="190" y="326" width="340" height="128" rx="14" fill="none" stroke="#e34948" stroke-width="2" stroke-dasharray="8 5"/>
-  <text x="210" y="344" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#e34948">Guardrails</text>
-  <text x="210" y="358" font-family="system-ui,sans-serif" font-size="9.5" fill="#e34948">permissions · scopes · max-steps</text>
-
-  <!-- Tool / Action Layer -->
-  <rect x="220" y="372" width="280" height="70" rx="12" fill="#008300"/>
-  <text x="360" y="402" text-anchor="middle" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="#ffffff">Tool / Action Layer</text>
-  <text x="360" y="421" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#ffffff">APIs · code exec · search · files</text>
-
-  <line x1="360" y1="442" x2="360" y2="480" stroke="#898781" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- Environment -->
-  <rect x="260" y="482" width="200" height="70" rx="12" fill="#4a3aa7"/>
-  <text x="360" y="512" text-anchor="middle" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="#ffffff">Environment</text>
-  <text x="360" y="531" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#ffffff">External world: web, DB, filesystem</text>
-
-  <!-- Feedback loop back to Agent Core -->
-  <path d="M460,517 C630,517 630,190 512,190" fill="none" stroke="#898781" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
-  <text x="644" y="360" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#52514e" transform="rotate(-90 644 360)">Observation / feedback</text>
-
-  <!-- legend caption -->
-  <text x="360" y="610" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#898781">Solid arrows = control flow · dashed = feedback &amp; guardrail scope</text>
-</svg>
+    style Guardrails fill:none,stroke:#e34948,stroke-width:2px,stroke-dasharray: 6 4,color:#e34948
+```
 
 - **Agent Core (LLM)** — the reasoning engine. Interprets the goal, consults memory, and decides the next action.
 - **Planner** — breaks the goal into sub-tasks and orders them; re-plans when a step fails or new information arrives.
