@@ -49,12 +49,12 @@ graph LR
     end
 
     classDef chain fill:#e1e0d9,color:#0b0b0b,stroke:#898781,stroke-width:1px;
-    classDef graph fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef lgNode fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
     classDef cond fill:#eda100,color:#0b0b0b,stroke:#a87400,stroke-width:1px;
     classDef store fill:#4a3aa7,color:#fff,stroke:#332876,stroke-width:1px;
 
     class L1,L2,L3 chain;
-    class G1,G3,G5,G4 graph;
+    class G1,G3,G5,G4 lgNode;
     class G2 cond;
     class CP store;
 ```
