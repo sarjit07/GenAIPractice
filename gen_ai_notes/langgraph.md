@@ -102,6 +102,8 @@ graph LR
 
 **In LangGraph:** a plain linear chain of nodes; each gate is a conditional edge that either continues forward or loops back to redo the previous node.
 
+**Real-life example:** Marketing copy generation — one LLM call drafts the copy, a gate checks it against brand guidelines, then a second call translates it into another language, with a final gate verifying the translation kept the original meaning.
+
 ### 2. Routing
 
 A classifier sends input to a specialized handler based on type — e.g., easy questions to a cheap/fast model, hard ones to a stronger one.
@@ -122,6 +124,8 @@ graph LR
 ```
 
 **In LangGraph:** one node returns a decision, followed by `add_conditional_edges` routing to whichever downstream node matches.
+
+**Real-life example:** Customer support triage — billing questions route to a prompt with account/billing context, technical bugs route to a code-aware model with access to error logs, and general FAQs route to a small, fast model — so you're not paying flagship-model cost for "what are your hours."
 
 ### 3. Parallelization
 
@@ -147,6 +151,8 @@ graph LR
 ```
 
 **In LangGraph:** the `Send` API fans out to run several nodes concurrently; their results merge back into shared state at the aggregating node (fan-out/fan-in).
+
+**Real-life example:** Code review automation (*sectioning*) — one LLM call checks a PR diff for security issues, another checks style/lint conventions, a third checks for performance regressions, all in parallel, merged into one review comment. Or content moderation (*voting*) — run a flagged post through 3 independent moderation calls and flag it only if a majority agree it violates policy, reducing false positives.
 
 ### 4. Orchestrator-Workers
 
@@ -175,6 +181,8 @@ graph TD
 
 **In LangGraph:** the orchestrator node emits a dynamic list of `Send` calls (one per subtask it decides on at runtime) targeting a worker node or subgraph; a synthesizer node merges results. This is the pattern behind most multi-agent supervisor setups.
 
+**Real-life example:** Deep-research report generation — an orchestrator reads the user's question, decides which sub-topics actually need investigating (not known in advance — depends on the question), spins up a worker per sub-topic to search and summarize, then synthesizes all worker outputs into one coherent report. This is the multi-agent pattern behind tools like Claude's own "Research" mode.
+
 ### 5. Evaluator-Optimizer
 
 One LLM generates, a second evaluates and gives feedback, looping until the output passes.
@@ -195,6 +203,8 @@ graph LR
 ```
 
 **In LangGraph:** exactly the cyclic edge this whole doc is about — a conditional edge from the evaluator back to the generator. `AgentExecutor` can't express this loop cleanly; it's a single declared edge in `StateGraph`.
+
+**Real-life example:** Literary translation — the generator produces a translation, the evaluator (prompted to focus on tone, idiom, and nuance rather than literal accuracy) critiques it, and the loop repeats with that feedback until the evaluator is satisfied. Same pattern works for code generation: generate → run tests → feed failures back to the generator → repeat until tests pass.
 
 **Rule of thumb:** start with the simplest workflow pattern that solves the problem; only reach for full agent autonomy (the `Reason → Act → Observe` graph above) when the task genuinely can't be decomposed ahead of time.
 
