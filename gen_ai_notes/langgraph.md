@@ -1,7 +1,7 @@
 # LangGraph
 
 *(As of mid-2026. LangChain's own* `AgentExecutor` *is now in maintenance mode — retiring Dec 2026 — with LangGraph as the recommended replacement for anything beyond a trivial chain.)*
-
+Langraph is an orchestration framework for building intelligent, stateful and multi-step LLM workflows. It enables advanced features like parallelism, loops, branching, memory, and resumability - making it ideal for agentic and production-grade AI application
 ---
 
 ## Why LangGraph exists
