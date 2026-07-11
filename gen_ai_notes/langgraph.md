@@ -78,6 +78,7 @@ Production surveys report `AgentExecutor` completing 78–85% of well-defined ta
 ## Common Agentic Workflow Patterns
 
 Anthropic's "Building Effective Agents" splits agentic systems into **workflows** (you hard-code the path an LLM call takes) versus a fully autonomous **agent** (the LLM decides its own path — the cyclic `Reason → Act → Observe` graph shown above). Five workflow patterns cover most real use cases; each maps directly onto LangGraph primitives.
+https://www.youtube.com/watch?v=D5KhiCDM9XQ&list=PLKnIA16_RmvYsvB8qkUQuJmJNuiCUJFPL&index=5
 
 ### 1. Prompt Chaining
 
