@@ -63,6 +63,77 @@ graph LR
 
 The left side is a black box: you can't see or control what happens between "Reason" and "Observe," and nothing survives a restart. The right side makes state, branching, and persistence explicit — every arrow and every decision point is something you actually declared.
 
+## Core LangGraph Concepts, in Plain Language
+
+### Graph
+Think of a graph as a **flowchart of your program** instead of code that runs top-to-bottom. You draw boxes (steps) and arrows (what happens next), and LangGraph walks the flowchart for you. The whole thing is called a `StateGraph`.
+
+### State
+State is a **shared clipboard** that every step can read from and write to. You define its shape upfront (which fields exist — e.g. `messages`, `plan`, `retry_count`) and it gets passed from node to node as the graph runs. No node calls another node directly — they only ever interact through this shared clipboard.
+
+### Nodes
+A node is just **a function**. It receives the current state, does something (call an LLM, hit an API, run a calculation), and returns a dict describing what changed. That's it — a node doesn't know or care what ran before it or what runs after; it only reads state in and hands an update back out.
+
+### Edges
+An edge is the **arrow between two nodes** — "after node A finishes, go to node B." Two kinds:
+- **Normal edge** — always goes to the same next node, no decision involved.
+- **Conditional edge** — a function looks at the current state and decides which node to go to next (this is how routing, branching, and loops all get built — it's the same primitive doing all three jobs).
+
+### Reducers
+A reducer is the **rule for merging** a node's returned update into the existing state, for one specific field. The default rule (no reducer specified) is simple **overwrite** — the new value replaces the old one. But some fields shouldn't be overwritten — e.g. a running list of chat messages should **append**, not erase history. You declare that explicitly (e.g. `Annotated[list, add_messages]`), and from then on, every node that touches `messages` gets appended instead of clobbering. This matters most when multiple nodes write to the same field in parallel — without a reducer telling LangGraph how to combine them, whichever write happens to land last would silently win.
+
+```mermaid
+graph TD
+    S0["State before superstep<br/>messages: [m1]"]
+    S0 --> NA["Node A runs<br/>returns messages: [m2]"]
+    S0 --> NB["Node B runs<br/>returns messages: [m3]"]
+    NA --> R{"Reducer for 'messages'<br/>= append"}
+    NB --> R
+    R --> S1["State after superstep<br/>messages: [m1, m2, m3]"]
+
+    classDef st fill:#e1e0d9,color:#0b0b0b,stroke:#898781,stroke-width:1px;
+    classDef stepNode fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef redNode fill:#4a3aa7,color:#fff,stroke:#332876,stroke-width:1px;
+    class S0,S1 st;
+    class NA,NB stepNode;
+    class R redNode;
+```
+
+Without a reducer here, Node A's and Node B's updates would race — one would overwrite the other and you'd silently lose a message. The reducer is what makes "run things in parallel and safely combine the results" possible at all.
+
+### Execution model: "supersteps" (borrowed from Google Pregel)
+
+LangGraph doesn't execute node-by-node in a simple line — it runs in rounds called **supersteps**, based on the same message-passing model Google's Pregel system uses for large-scale graph processing:
+
+1. At the start of a superstep, every node that has new incoming state "wakes up" and runs — if several nodes are ready at once, they run **in parallel**, all within the same superstep.
+2. Each node returns its update; all updates get merged into shared state via their reducers.
+3. Edges (including conditional ones) determine which nodes wake up for the *next* superstep.
+4. This repeats until no node has anything left to do — that's when the graph reaches `END`.
+
+```mermaid
+graph LR
+    Begin(["START"]) --> A["Node A<br/>(reads state, calls LLM)"]
+    A --> B{"Conditional edge<br/>(a function decides)"}
+    B -->|needs tool| C["Node B<br/>(tool call)"]
+    B -->|done reasoning| D["Node C<br/>(final answer)"]
+    C --> A
+    D --> Done(["END"])
+
+    classDef io fill:#e1e0d9,color:#0b0b0b,stroke:#898781,stroke-width:1px;
+    classDef stepNode fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef condNode fill:#eda100,color:#0b0b0b,stroke:#a87400,stroke-width:1px;
+    class Begin,Done io;
+    class A,C,D stepNode;
+    class B condNode;
+```
+
+This one mental model — supersteps + reducers — is what quietly gives you cycles (loop back to node A), branching (conditional edge), and parallel fan-out/fan-in (multiple nodes active in the same superstep) all from the same engine, instead of three separate features bolted on.
+
+**Related concepts, briefly:**
+- **Compiling** — you build the graph by describing nodes/edges, then call `.compile()` once before running it; this is what turns the description into an executable graph (and is where you attach a checkpointer).
+- **Checkpointer** — the persistence layer that saves state after every superstep, which is what makes pause/resume and crash recovery (from the problem/fix table above) actually work.
+- **`Send`** — how a node dynamically creates extra work for the *next* superstep (e.g. "spawn one worker per subtask I just decided on") — this is the primitive behind orchestrator-workers and parallelization above.
+
 ## Reliability in practice
 
 Production surveys report `AgentExecutor` completing 78–85% of well-defined tasks, dropping to 55–70% once a task needs more than ~5 tool calls or any error recovery. LangGraph-based workflows report 88–95% completion on the same class of complex, multi-step tasks — the gap widens as task complexity grows, which tracks with the list above: most of what breaks `AgentExecutor` at scale (crash recovery, branching, retries) is exactly what LangGraph makes explicit.
@@ -221,4 +292,10 @@ graph LR
 ### Workflow Patterns
 - [Building Effective AI Agents — Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
 - [Anthropic's Effective Agents Framework: A Pattern Map — AgentPatterns.ai](https://www.agentpatterns.ai/agent-design/anthropic-effective-agents-framework/)
+
+### Core Concepts (Graph, State, Reducers, Supersteps)
+- [Graph API overview — Docs by LangChain](https://docs.langchain.com/oss/python/langgraph/graph-api)
+- [LangGraph Nodes, Edges & State: Core Concepts Explained — machinelearningplus](https://machinelearningplus.com/gen-ai/langgraph-graph-concepts-nodes-edges-state/)
+- [Learning LangGraph the Right Way: Why State, Reducers, and Super-steps Are the Real Core](https://medium.com/@yhocotw31016/learning-langgraph-the-right-way-why-state-reducers-and-super-steps-are-the-real-core-af84490ea6d3)
+- [LangGraph Transactions — Pregel, Message Passing and Super-steps](https://medium.com/@maksymilian.pilzys/langgraph-transactions-pregel-message-passing-and-super-steps-0e101e620f10)
 
