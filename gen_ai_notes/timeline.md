@@ -84,21 +84,25 @@
 **What:** Haiku, Sonnet, Opus — speed/cost/intelligence tiers. Opus briefly best model on benchmarks.  
 **Why:** Introduced the tiered model strategy. Showed Constitutional AI + scale = top-tier reasoning with strong safety properties.
 
+### May 2024 — AlphaFold 3 (Google DeepMind)
+**What:** Extended AlphaFold to predict structures of all biomolecules (DNA, RNA, ligands, proteins together), published in Nature.  
+**Why:** New drug compounds identified and tested in months instead of years. AI became a first-class tool in pharmaceutical R&D and materials science.
+
 ### Sep 2024 — OpenAI o1 (Reasoning Models)
 **What:** Models trained to "think before answering" via chain-of-thought reasoning at inference time (not just pre-training).  
 **Why:** Major leap in math, coding, science reasoning. Introduced test-time compute scaling as a new axis alongside model size.
+
+### Nov 2024 — MCP (Model Context Protocol) launches (Anthropic)
+**What:** Open standard letting LLMs connect to tools, data sources, and services through a common protocol.  
+**Why:** Solved the "tool integration" fragmentation problem right before agents took off. Claude Code, Cursor, and other AI IDEs converged on it. Foundation for the 2025 agent boom.
 
 ### Jan 2025 — DeepSeek R1 (China, open-source)
 **What:** Open reasoning model matching o1 performance, trained at a fraction of the cost using RL without SFT warm-up.  
 **Why:** Shocked the AI industry. Proved state-of-the-art reasoning is achievable cheaply and open. Triggered market panic (Nvidia stock -17%).
 
-### 2025 — Agentic AI + MCP (Model Context Protocol)
-**What:** Standardized protocol (Anthropic's MCP) for LLMs to connect to tools, data sources, and services.  
-**Why:** Solving the "tool integration" fragmentation problem. Claude Code, Cursor, and other AI IDEs built on this. Agents become production-grade.
-
-### 2025 — Claude 4 Family (Anthropic)
-**What:** Haiku 4.5, Sonnet 4.6, Opus 4.8, Fable 5 — new capability and efficiency tiers.  
-**Why:** Continued push on coding, reasoning, and long-context. Sonnet 4.6 became default workhorse for Claude Code.
+### May 2025 — Claude 4 (Opus 4, Sonnet 4) (Anthropic)
+**What:** First models in the Claude 4 lineage — a major jump in coding and agentic tool-use over Claude 3.  
+**Why:** Kicked off a fast-moving Claude 4.x release cadence (Sonnet 4.5, Haiku 4.5, Opus 4.5, Sonnet 4.6, Opus 4.8...) that ran through 2026 — see "2025 Onwards" section below for the full lineage.
 
 ---
 
@@ -270,8 +274,8 @@ RNN Era (pre-2017)                    Transformer Era (2017+)
 
 ## 2025 Onwards — The Agentic & Multimodal Era
 
-### Mid 2025 — o3 & Reasoning Model Maturity (OpenAI)
-**What:** o3 and o3-mini introduced a `reasoning_effort` parameter — let callers trade tokens for accuracy. Smaller models could outperform ones 14x larger when given more compute budget at inference.  
+### Jan–Apr 2025 — o3-mini → o3 & o4-mini (OpenAI)
+**What:** o3-mini (Jan 31) then o3 + o4-mini together (Apr 16) introduced a `reasoning_effort` parameter — let callers trade tokens for accuracy. Smaller models could outperform ones 14x larger when given more compute budget at inference.  
 **Why:** Test-time compute emerged as a new scaling axis independent of model size. You don't need a bigger model — you need a smarter inference strategy.
 
 ### May 2025 — Veo 3 (Google DeepMind) — Native Audio in Video
@@ -282,6 +286,10 @@ RNN Era (pre-2017)                    Transformer Era (2017+)
 **What:** Merged the previously separate "chat" and "reasoning" model lines into one. Ships a real-time internal router between fast and thinking modes. Outperforms o3 while using 50–80% fewer output tokens.  
 **Why:** Proved you can have speed and depth in one model. Eliminated the "pick fast or smart" tradeoff users had with GPT-4 vs o1.
 
+### Sep 2025 — Claude Sonnet 4.5 (Anthropic)
+**What:** Next step in the Claude 4 lineage after the May 2025 Opus 4 / Sonnet 4 launch — large gains in coding and long-horizon agentic tasks.  
+**Why:** Became a widely-used daily-driver model for coding agents ahead of the Haiku/Opus refreshes that followed.
+
 ### Sep 2025 — Sora 2 (OpenAI)
 **What:** Best-in-class physics simulation in video generation. Multi-shot storyboards, cinematic camera control.  
 **Why:** Physics coherence (objects bounce, liquids flow, people move naturally) was the last frontier in believable video generation.
@@ -290,16 +298,24 @@ RNN Era (pre-2017)                    Transformer Era (2017+)
 **What:** Chip that performs AI matrix multiplications using light (photons) instead of electricity.  
 **Why:** Moore's law is slowing. Optical computing offers massive bandwidth and energy efficiency gains. Beginning of post-GPU AI hardware era.
 
-### Nov 2025 — AlphaFold 3 & AI for Science (DeepMind)
-**What:** Extended AlphaFold to predict structures of all biomolecules (DNA, RNA, ligands, proteins together). Drug-target interaction modeling.  
-**Why:** New drug compounds identified and tested in months instead of years. AI became a first-class tool in pharmaceutical R&D and materials science.
+### Oct 2025 — Claude Haiku 4.5 (Anthropic)
+**What:** Fast/cheap tier of the Claude 4.5 refresh, following Sonnet 4.5.  
+**Why:** Kept the fast tier current with the reasoning gains rolling through the rest of the Claude 4.x family.
+
+### Nov 2025 — Claude Opus 4.5 (Anthropic)
+**What:** Top-of-lineup tier of the Claude 4.5 refresh, completing Sonnet 4.5 → Haiku 4.5 → Opus 4.5.  
+**Why:** Rounded out the Claude 4.5 generation across all three tiers before the 4.6 / 4.8 / 5 releases that followed in 2026.
+
+### Nov 2025 — Gemini 3 Pro (Google)
+**What:** Natively multimodal, Deep Think mode, 1M+ context. Ranked #1 on LMSYS Arena at launch (~1501 Elo).  
+**Why:** Google reclaimed the benchmark crown after GPT-4 dominated 2023. Long-context + multimodal as primary differentiators. (Followed by Gemini 3.1 Pro in Feb 2026.)
 
 ### Dec 2025 — GPT-5.2 (OpenAI)
-**What:** 400K context window, $1.75/M input tokens, optimized for coding, spreadsheets, and multi-step agentic tasks.  
-**Why:** Showed that long-context + agentic reliability + cost reduction all move together. The "daily driver" for enterprise automation.
+**What:** Flagship reasoning model with Instant/Thinking/Pro tiers, optimized for coding, spreadsheets, and multi-step agentic tasks.  
+**Why:** Showed that long-context + agentic reliability + cost reduction all move together. A "daily driver" for enterprise automation.
 
-### 2025 — MCP + A2A Protocols Standardized
-**What:** MCP (Model Context Protocol, by Anthropic) = standard for agent-to-tool communication. A2A (Agent-to-Agent) = standard for agents calling other agents.  
+### 2025 — A2A Protocol Standardized (building on MCP)
+**What:** A2A (Agent-to-Agent) emerged as a standard for agents calling other agents, complementing MCP (launched Nov 2024) which standardized agent-to-tool communication.  
 **Why:** Solved the integration fragmentation problem. Like HTTP for the web, MCP/A2A created a common layer so any agent can connect to any tool or service. Claude Code, Cursor, and IDE tools all converged on MCP.
 
 ### 2025 — AI Math Olympiad Gold (OpenAI + Google)
@@ -310,20 +326,24 @@ RNN Era (pre-2017)                    Transformer Era (2017+)
 **What:** 79% of organizations reported agentic AI adoption in 2025; 96% planning expansion. Gartner: 40% of enterprise apps will include task-specific agents by end of 2026 (vs <5% in 2025).  
 **Why:** Agents moved from experimental to production. The unit of AI value shifted from "chatbot response" to "completed workflow."
 
-### 2026 — Gemini 3 Pro (Google)
-**What:** Natively multimodal, Deep Think mode, 1M+ context. Ranked #1 on LMSYS Arena at launch.  
-**Why:** Google finally reclaimed the benchmark crown after GPT-4 dominated 2023. Long-context + multimodal as primary differentiators.
+### Feb 2026 — Claude Sonnet 4.6 (Anthropic)
+**What:** Mid-tier refresh continuing the Claude 4.x line after Opus 4.5.  
+**Why:** Became a default workhorse tier for coding-agent workloads ahead of the Opus 4.8 / Fable 5 / Sonnet 5 releases later in 2026.
 
 ### Apr 2026 — Meta Muse Spark (Meta Superintelligence Labs)
 **What:** First model from Meta's rebranded AI lab (post-Alexandr Wang acquisition). Native multimodal reasoning, 1M self-managed context, built-in primary-agent + sub-agent orchestration.  
 **Why:** Meta's signal that the next competitive axis is native multi-agent architecture baked into the model itself — not a wrapper on top.
 
-### Jun 2026 — Claude Fable 5 / Mythos 5 (Anthropic)
-**What:** New capability tier above Opus. Released June 9, briefly suspended June 12–30 under US government export control directive, restored July 1.  
-**Why:** Regulatory events (export controls) now directly affect model availability — first major instance of government intervention pausing a model release.
+### May 2026 — Claude Opus 4.8 (Anthropic)
+**What:** Top-tier release continuing the Claude 4.x line, just ahead of the Fable/Mythos 5 and Sonnet 5 releases.  
+**Why:** Last top-of-line Opus release before Anthropic introduced its "5" generation naming (Fable 5, Sonnet 5) the following month.
+
+### Jun 2026 — Claude Fable 5 / Mythos 5, then Sonnet 5 (Anthropic)
+**What:** Fable 5 (aka Mythos 5) — a new capability tier above Opus — released June 9. Briefly suspended June 12–30 under a US government export-control directive (Commerce Dept., triggered by a reported jailbreak incident), then restored July 1. Sonnet 5 followed June 30.  
+**Why:** First major instance of a government export-control action directly pausing a model's availability — regulation became a live constraint on model releases, not just training data/compute.
 
 ### Jul 2026 — GPT-5.6 Family: Sol, Terra, Luna (OpenAI)
-**What:** Three-model family — different cost/speed/capability tiers — now default on ChatGPT.  
+**What:** Three-model family — Sol (flagship), Terra (balanced), Luna (fast/cheap) — launched Jul 9, now default on ChatGPT.  
 **Why:** Tiered model strategy (fast/cheap vs powerful/expensive) became industry standard. Every major lab now ships model families, not single models.
 
 ---
@@ -441,7 +461,7 @@ Quality: blocky → coherent → photorealistic → broadcast quality
 | Agents | 2023 | Respond → Act (tools, memory, planning) |
 | Reasoning | 2024 | Single-pass → Think-then-answer (test-time compute) |
 | Open Source | 2023–2025 | Closed → Competitive open-weight models |
-| Agentic Infra | 2025 | Custom integrations → MCP/A2A standard protocols |
+| Agentic Infra | 2024–2025 | Custom integrations → MCP/A2A standard protocols |
 | Video Gen | 2025 | Choppy clips → 4K + physics + sync audio |
 | Multi-Agent | 2026 | Single LLM → Orchestrator + specialist sub-agents |
 | AI Regulation | 2026 | Self-governed → Government export controls on models |
@@ -477,6 +497,8 @@ Quality: blocky → coherent → photorealistic → broadcast quality
 - [Introducing GPT-5 — OpenAI (Aug 2025)](https://openai.com/index/introducing-gpt-5/)
 - [Sora: Creating video from text — OpenAI](https://openai.com/index/sora/)
 - [Google's Year in Review: 8 Research Breakthroughs in 2025](https://blog.google/innovation-and-ai/products/2025-research-breakthroughs/)
+- [Introducing the Model Context Protocol — Anthropic (Nov 2024)](https://www.anthropic.com/news/model-context-protocol)
+- [AlphaFold 3 — Google DeepMind & Isomorphic Labs (May 2024)](https://blog.google/innovation-and-ai/products/google-deepmind-isomorphic-alphafold-3-ai-model/)
 
 ### Industry Reports & Analysis
 - [The 10 AI Developments That Defined 2025 — KDnuggets](https://www.kdnuggets.com/the-10-ai-developments-that-defined-2025)
