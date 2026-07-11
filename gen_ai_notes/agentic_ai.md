@@ -6,6 +6,39 @@
 
 An agent is an LLM wrapped in a loop that lets it act, observe results, and decide its own next step toward a goal — rather than producing one response and stopping.
 
+```mermaid
+graph TD
+    A(("Agentic AI<br/>reason → act → observe"))
+    A --> C1["1. Autonomy"]
+    A --> C2["2. Planning"]
+    A --> C3["3. Tool Use"]
+    A --> C4["4. Feedback Loop"]
+    A --> C5["5. Memory"]
+    A --> C6["6. Multi-step"]
+    A --> C7["7. Self-Correction"]
+    A --> C8["8. Guardrails"]
+
+    classDef center fill:#fcfcfb,stroke:#0b0b0b,stroke-width:2px,color:#0b0b0b,font-weight:bold;
+    classDef c1 fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef c2 fill:#1baf7a,color:#fff,stroke:#128a5e,stroke-width:1px;
+    classDef c3 fill:#eda100,color:#fff,stroke:#a87400,stroke-width:1px;
+    classDef c4 fill:#008300,color:#fff,stroke:#005c00,stroke-width:1px;
+    classDef c5 fill:#4a3aa7,color:#fff,stroke:#332876,stroke-width:1px;
+    classDef c6 fill:#e34948,color:#fff,stroke:#a92e2d,stroke-width:1px;
+    classDef c7 fill:#e87ba4,color:#fff,stroke:#b5537a,stroke-width:1px;
+    classDef c8 fill:#eb6834,color:#fff,stroke:#b04a22,stroke-width:1px;
+
+    class A center;
+    class C1 c1;
+    class C2 c2;
+    class C3 c3;
+    class C4 c4;
+    class C5 c5;
+    class C6 c6;
+    class C7 c7;
+    class C8 c8;
+```
+
 ## Key Characteristics
 
 1. **Autonomy** — it decides *what to do next*, not just what to say. Given a goal, it chooses actions without a human specifying each step.
