@@ -75,7 +75,129 @@ Production surveys report `AgentExecutor` completing 78–85% of well-defined ta
 
 ---
 
+## Common Agentic Workflow Patterns
 
+Anthropic's "Building Effective Agents" splits agentic systems into **workflows** (you hard-code the path an LLM call takes) versus a fully autonomous **agent** (the LLM decides its own path — the cyclic `Reason → Act → Observe` graph shown above). Five workflow patterns cover most real use cases; each maps directly onto LangGraph primitives.
+
+### 1. Prompt Chaining
+
+Sequential LLM calls, each step's output feeding the next, with a validation gate between steps. Best when a task decomposes into a fixed sequence.
+
+```mermaid
+graph LR
+    In(["Input"]) --> S1["LLM call 1"] --> G1{"Gate: pass?"}
+    G1 -->|ok| S2["LLM call 2"] --> G2{"Gate: pass?"}
+    G2 -->|ok| S3["LLM call 3"] --> Out(["Output"])
+    G1 -.->|fail| Fix1["Retry / fix"] -.-> S1
+    G2 -.->|fail| Fix2["Retry / fix"] -.-> S2
+
+    classDef io fill:#e1e0d9,color:#0b0b0b,stroke:#898781,stroke-width:1px;
+    classDef llmNode fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef gateNode fill:#eda100,color:#0b0b0b,stroke:#a87400,stroke-width:1px;
+    class In,Out io;
+    class S1,S2,S3,Fix1,Fix2 llmNode;
+    class G1,G2 gateNode;
+```
+
+**In LangGraph:** a plain linear chain of nodes; each gate is a conditional edge that either continues forward or loops back to redo the previous node.
+
+### 2. Routing
+
+A classifier sends input to a specialized handler based on type — e.g., easy questions to a cheap/fast model, hard ones to a stronger one.
+
+```mermaid
+graph LR
+    In(["Input"]) --> R{"Router / classifier"}
+    R -->|type A| HA["Handler A<br/>(fast model)"] --> Out(["Output"])
+    R -->|type B| HB["Handler B<br/>(strong model)"] --> Out
+    R -->|type C| HC["Handler C<br/>(tool-specific)"] --> Out
+
+    classDef io fill:#e1e0d9,color:#0b0b0b,stroke:#898781,stroke-width:1px;
+    classDef llmNode fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef gateNode fill:#eda100,color:#0b0b0b,stroke:#a87400,stroke-width:1px;
+    class In,Out io;
+    class HA,HB,HC llmNode;
+    class R gateNode;
+```
+
+**In LangGraph:** one node returns a decision, followed by `add_conditional_edges` routing to whichever downstream node matches.
+
+### 3. Parallelization
+
+Multiple LLM calls run at once, then get aggregated programmatically. Two variants: **sectioning** (independent subtasks in parallel) or **voting** (same task run N times, take consensus).
+
+```mermaid
+graph LR
+    In(["Input"]) --> Split["Split"]
+    Split --> P1["LLM call 1"]
+    Split --> P2["LLM call 2"]
+    Split --> P3["LLM call 3"]
+    P1 --> Agg["Aggregate"]
+    P2 --> Agg
+    P3 --> Agg
+    Agg --> Out(["Output"])
+
+    classDef io fill:#e1e0d9,color:#0b0b0b,stroke:#898781,stroke-width:1px;
+    classDef llmNode fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef aggNode fill:#008300,color:#fff,stroke:#005c00,stroke-width:1px;
+    class In,Out,Split io;
+    class P1,P2,P3 llmNode;
+    class Agg aggNode;
+```
+
+**In LangGraph:** the `Send` API fans out to run several nodes concurrently; their results merge back into shared state at the aggregating node (fan-out/fan-in).
+
+### 4. Orchestrator-Workers
+
+A central LLM dynamically decides *what* subtasks are needed (not fixed upfront, unlike parallelization) and delegates to worker LLMs, then synthesizes their results.
+
+```mermaid
+graph TD
+    In(["Input"]) --> O["Orchestrator LLM<br/>(plans subtasks)"]
+    O --> W1["Worker 1"]
+    O --> W2["Worker 2"]
+    O --> W3["Worker n…"]
+    W1 --> Synth["Synthesizer"]
+    W2 --> Synth
+    W3 --> Synth
+    Synth --> Out(["Output"])
+
+    classDef io fill:#e1e0d9,color:#0b0b0b,stroke:#898781,stroke-width:1px;
+    classDef llmNode fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef orchNode fill:#4a3aa7,color:#fff,stroke:#332876,stroke-width:1px;
+    classDef aggNode fill:#008300,color:#fff,stroke:#005c00,stroke-width:1px;
+    class In,Out io;
+    class W1,W2,W3 llmNode;
+    class O orchNode;
+    class Synth aggNode;
+```
+
+**In LangGraph:** the orchestrator node emits a dynamic list of `Send` calls (one per subtask it decides on at runtime) targeting a worker node or subgraph; a synthesizer node merges results. This is the pattern behind most multi-agent supervisor setups.
+
+### 5. Evaluator-Optimizer
+
+One LLM generates, a second evaluates and gives feedback, looping until the output passes.
+
+```mermaid
+graph LR
+    In(["Input"]) --> Gen["Generator LLM"]
+    Gen --> Ev{"Evaluator LLM"}
+    Ev -->|accept| Out(["Output"])
+    Ev -.->|reject + feedback| Gen
+
+    classDef io fill:#e1e0d9,color:#0b0b0b,stroke:#898781,stroke-width:1px;
+    classDef llmNode fill:#2a78d6,color:#fff,stroke:#184f95,stroke-width:1px;
+    classDef evalNode fill:#e34948,color:#fff,stroke:#a92e2d,stroke-width:1px;
+    class In,Out io;
+    class Gen llmNode;
+    class Ev evalNode;
+```
+
+**In LangGraph:** exactly the cyclic edge this whole doc is about — a conditional edge from the evaluator back to the generator. `AgentExecutor` can't express this loop cleanly; it's a single declared edge in `StateGraph`.
+
+**Rule of thumb:** start with the simplest workflow pattern that solves the problem; only reach for full agent autonomy (the `Reason → Act → Observe` graph above) when the task genuinely can't be decomposed ahead of time.
+
+---
 
 ## Sources & References
 
@@ -84,4 +206,8 @@ Production surveys report `AgentExecutor` completing 78–85% of well-defined ta
 - [LangChain vs LangGraph: Complete Comparison 2026](https://www.digitalapplied.com/blog/langchain-vs-langgraph-comparison-2026)
 - [LangGraph vs LangChain: Which to Use for Production AI Agents in 2026 — Spheron](https://www.spheron.network/blog/langgraph-vs-langchain/)
 - [Choosing an agent framework: LangChain vs LangGraph vs CrewAI vs PydanticAI vs Mastra vs Vercel AI SDK — Speakeasy](https://www.speakeasy.com/blog/ai-agent-framework-comparison)
+
+### Workflow Patterns
+- [Building Effective AI Agents — Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
+- [Anthropic's Effective Agents Framework: A Pattern Map — AgentPatterns.ai](https://www.agentpatterns.ai/agent-design/anthropic-effective-agents-framework/)
 
