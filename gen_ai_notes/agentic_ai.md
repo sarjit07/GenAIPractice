@@ -104,6 +104,26 @@ graph TD
 - **Guardrails** — permissions, tool scopes, and max-step limits that bound what the core is allowed to do — wraps the action layer, not just a policy on paper.
 - **Observation / feedback loop** (dashed) — the result of every action flows back into the core's context, closing the Reason → Act → Observe cycle.
 
+## Agentic AI Frameworks & Libraries
+
+*(Landscape as of mid-2026 — this space moves fast, revisit periodically.)*
+
+| Framework | Category | Best for |
+|---|---|---|
+| **LangGraph** | Orchestration (graph-based) | Max control; durable, auditable, long-running workflows with precise error recovery. Most production-mature. |
+| **Microsoft Agent Framework 1.0** | Orchestration (graph-based) | Multi-party agent conversations — debate, consensus, sequential dialogue. Merged AutoGen + Semantic Kernel (GA Apr 2026). |
+| **Google ADK 2.0** | Orchestration (graph-based) | GCP/Vertex AI/Gemini shops; coordinator agent delegating to sub-agents, fan-out/fan-in. |
+| **LlamaIndex Workflows 1.0** | Orchestration (graph-based) | Lightweight, event-driven, async-first, step-based (Python + TypeScript, Jun 2026). |
+| **CrewAI** | High-level crew abstraction | Fastest path to a working multi-agent setup — role-based agents, parallel task execution. Least low-level control. |
+| **Smolagents** (Hugging Face) | High-level crew abstraction | Minimal, code-first — agents write and run Python to act instead of calling structured tools. |
+| **OpenAI Agents SDK** | Vendor-native SDK | Fastest setup if you're committed to OpenAI models. |
+| **Claude Agent SDK** (Anthropic) | Vendor-native SDK | Claude-native equivalent — this is what Claude Code itself is built on. |
+| **Pydantic AI** | Type-safety-first | Schema/validation-first — best when correctness of structured output matters more than orchestration flexibility. |
+| **MCP** (Anthropic, Nov 2024) | Protocol, not a framework | Standardizes agent ↔ tool communication. |
+| **A2A** (Google-led, 2025) | Protocol, not a framework | Standardizes agent ↔ agent communication. |
+
+**Orchestration vs. crew abstraction, in one line:** LangGraph/ADK/Microsoft Agent Framework make you explicitly define the graph — nodes, edges, state, error routing. CrewAI/Smolagents hide that: you describe roles and tasks, and the framework builds the execution graph internally — faster to start, less control.
+
 ## Next Sections to Write
 - [ ] The Agent Loop (ReAct: Reason → Act → Observe) — deep dive
 - [ ] Tool Use / Function Calling — how models call tools, schemas, error handling
