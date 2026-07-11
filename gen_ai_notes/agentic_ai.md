@@ -108,21 +108,28 @@ graph TD
 
 *(Landscape as of mid-2026 — this space moves fast, revisit periodically.)*
 
-| Framework | Category | Best for |
-|---|---|---|
-| **LangGraph** | Orchestration (graph-based) | Max control; durable, auditable, long-running workflows with precise error recovery. Most production-mature. |
-| **Microsoft Agent Framework 1.0** | Orchestration (graph-based) | Multi-party agent conversations — debate, consensus, sequential dialogue. Merged AutoGen + Semantic Kernel (GA Apr 2026). |
-| **Google ADK 2.0** | Orchestration (graph-based) | GCP/Vertex AI/Gemini shops; coordinator agent delegating to sub-agents, fan-out/fan-in. |
-| **LlamaIndex Workflows 1.0** | Orchestration (graph-based) | Lightweight, event-driven, async-first, step-based (Python + TypeScript, Jun 2026). |
-| **CrewAI** | High-level crew abstraction | Fastest path to a working multi-agent setup — role-based agents, parallel task execution. Least low-level control. |
-| **Smolagents** (Hugging Face) | High-level crew abstraction | Minimal, code-first — agents write and run Python to act instead of calling structured tools. |
-| **OpenAI Agents SDK** | Vendor-native SDK | Fastest setup if you're committed to OpenAI models. |
-| **Claude Agent SDK** (Anthropic) | Vendor-native SDK | Claude-native equivalent — this is what Claude Code itself is built on. |
-| **Pydantic AI** | Type-safety-first | Schema/validation-first — best when correctness of structured output matters more than orchestration flexibility. |
-| **MCP** (Anthropic, Nov 2024) | Protocol, not a framework | Standardizes agent ↔ tool communication. |
-| **A2A** (Google-led, 2025) | Protocol, not a framework | Standardizes agent ↔ agent communication. |
+**Orchestration frameworks (you build the graph/loop)**
+- **LangGraph** — most control, steepest learning curve, most production-mature; best for durable, auditable, long-running workflows with precise error recovery.
+- **Microsoft Agent Framework 1.0** (GA Apr 2026) — merged AutoGen + Semantic Kernel into one SDK (Python + .NET); AutoGen's simple multi-agent conversation patterns (debates, consensus, sequential dialogue) plus Semantic Kernel's enterprise plumbing (state, type safety, middleware, telemetry).
+- **Google ADK 2.0** (updated at I/O 2026) — shifted from a hierarchical executor to a graph-based engine like LangGraph; strong for coordinator→sub-agent delegation, tightly integrated with Vertex AI/Gemini.
+- **LlamaIndex Workflows 1.0** (Jun 2026) — lightweight, event-driven, async-first, step-based; Python + TypeScript.
 
-**Orchestration vs. crew abstraction, in one line:** LangGraph/ADK/Microsoft Agent Framework make you explicitly define the graph — nodes, edges, state, error routing. CrewAI/Smolagents hide that: you describe roles and tasks, and the framework builds the execution graph internally — faster to start, less control.
+**Higher-level "just describe the crew" abstractions**
+- **CrewAI** — easiest learning curve, role-based agents executing in parallel; least low-level control.
+- **Smolagents** (Hugging Face) — minimal, code-first, agents write and run Python to act rather than calling structured tools.
+
+**Vendor-native SDKs (fastest setup, tied to one model)**
+- **OpenAI Agents SDK** — fastest to stand up, OpenAI-models-only.
+- **Claude Agent SDK** (Anthropic) — same idea for Claude; this is what Claude Code itself is built on.
+
+**Type-safety-first**
+- **Pydantic AI** — schema/validation-first agent building, popular where correctness of structured output matters more than orchestration flexibility.
+
+**Protocols, not frameworks (connective tissue between agents/tools)**
+- **MCP** (Anthropic, Nov 2024) — agent ↔ tool standard.
+- **A2A** (Google-led, 2025) — agent ↔ agent standard.
+
+**Rule of thumb:** LangGraph if you need control and reliability at scale, CrewAI if you want the fastest path to a working multi-agent setup, Microsoft Agent Framework if agents need to talk to each other (debate/consensus), Google ADK if you're already on GCP/Gemini, and the vendor SDKs (OpenAI/Claude) if you're committed to one model provider and want the least ceremony.
 
 ## Next Sections to Write
 - [ ] The Agent Loop (ReAct: Reason → Act → Observe) — deep dive
@@ -134,3 +141,18 @@ graph TD
 - [ ] A2A (Agent-to-Agent Protocol) — agent-to-agent standard
 - [ ] Failure modes — infinite loops, tool misuse, hallucinated actions, guardrails
 - [ ] Evaluating agents — success criteria beyond single-turn accuracy
+
+---
+
+## Sources & References
+
+### Frameworks & Libraries
+- [AI Agent Frameworks Compared: LangGraph vs CrewAI vs AutoGen (2026)](https://pecollective.com/blog/ai-agent-frameworks-compared/)
+- [CrewAI vs LangGraph vs AutoGen vs OpenAgents (2026) — OpenAgents](https://openagents.org/blog/posts/2026-02-23-open-source-ai-agent-frameworks-compared)
+- [AI Agent Frameworks (2026 Update): 8 SDKs Compared + Claude Agent SDK Primitive Reference — Morph](https://www.morphllm.com/ai-agent-framework)
+- [Top 9 AI Agent Frameworks as of March 2026 — Shakudo](https://www.shakudo.io/blog/top-9-ai-agent-frameworks)
+- [The best AI agent frameworks in 2026 — LangChain](https://www.langchain.com/resources/ai-agent-frameworks)
+
+### Core Concepts
+- [Introducing the Model Context Protocol — Anthropic (Nov 2024)](https://www.anthropic.com/news/model-context-protocol)
+- [ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al., 2022)](https://arxiv.org/abs/2210.03629)
