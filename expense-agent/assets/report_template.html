@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Statement report</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:#f9f9f7; --surface-1:#fcfcfb;
+    --text-primary:#0b0b0b; --text-secondary:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300;
+    --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+    --wash:rgba(11,11,11,0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:#0d0d0d; --surface-1:#1a1a19;
+      --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300;
+      --wash:rgba(255,255,255,0.06);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:#0d0d0d; --surface-1:#1a1a19;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300;
+    --wash:rgba(255,255,255,0.06);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:24px 16px 48px;
+    background:var(--page); color:var(--text-primary);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:15px; line-height:1.5;
+  }
+  .wrap { max-width:1080px; margin:0 auto; }
+  .card, .row2 > *, .kpi, .scroller, .tblbox, .donutwrap, .legend { min-width:0; }
+  .scroller, .tblbox { max-width:100%; }
+
+  header.top { margin-bottom:20px; }
+  h1 { font-size:22px; font-weight:600; margin:0 0 4px; letter-spacing:-0.01em; }
+  .sub { color:var(--text-secondary); font-size:13.5px; }
+  .sub code { background:var(--wash); padding:1px 6px; border-radius:5px; font-size:12.5px; }
+
+  .card {
+    background:var(--surface-1); border:1px solid var(--border);
+    border-radius:14px; padding:20px; margin-bottom:16px;
+  }
+  h2 { font-size:15px; font-weight:600; margin:0 0 2px; }
+  .cap { color:var(--muted); font-size:12.5px; margin:0 0 18px; }
+
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:12px; margin-bottom:16px; }
+  .kpi { background:var(--surface-1); border:1px solid var(--border); border-radius:14px; padding:16px 18px; }
+  .kpi .lab { font-size:12.5px; color:var(--text-secondary); margin-bottom:6px; }
+  .kpi .val { font-size:26px; font-weight:600; letter-spacing:-0.02em; line-height:1.15; }
+  .kpi .val.sm { font-size:21px; }
+  .kpi .note { font-size:11.5px; color:var(--muted); margin-top:5px; }
+  .hero { grid-column:span 2; }
+  .hero .val { font-size:38px; }
+  @media (max-width:560px){ .hero { grid-column:span 1; } .hero .val { font-size:30px; } }
+
+  .banner {
+    display:flex; gap:10px; align-items:flex-start;
+    border:1px solid var(--border); border-left:3px solid var(--warn);
+    background:var(--surface-1); border-radius:12px; padding:13px 16px; margin-bottom:16px;
+    font-size:13.5px; color:var(--text-secondary);
+  }
+  .banner b { color:var(--text-primary); font-weight:600; }
+  .banner .ic { flex:none; font-size:14px; line-height:1.45; }
+
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:840px){ .row2 { grid-template-columns:1fr; } }
+  .donutwrap { display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
+  .donutwrap svg { flex:none; }
+  .legend { flex:1 1 190px; min-width:150px; display:flex; flex-direction:column; gap:9px; }
+  .lgd { display:flex; align-items:baseline; gap:9px; font-size:13px; }
+  .sw { width:10px; height:10px; border-radius:3px; flex:none; transform:translateY(1px); }
+  .lgd .nm { flex:1; color:var(--text-secondary); }
+  .lgd .amt { font-variant-numeric:tabular-nums; font-weight:600; }
+  .lgd .pc { color:var(--muted); font-size:11.5px; font-variant-numeric:tabular-nums; width:42px; text-align:right; }
+  .scroller { overflow-x:auto; }
+  svg text { font-family:inherit; }
+
+  .tbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  input[type=search] {
+    font:inherit; font-size:13.5px; padding:8px 12px; min-height:36px;
+    border:1px solid var(--border); border-radius:10px;
+    background:var(--page); color:var(--text-primary); min-width:200px; flex:1 1 220px;
+  }
+  select { font:inherit; font-size:13px; padding:8px 10px; min-height:36px;
+    border:1px solid var(--border); border-radius:10px; background:var(--page); color:var(--text-primary); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  table.wide { min-width:560px; }
+  th, td { padding:9px 10px; text-align:left; border-bottom:1px solid var(--grid);
+           vertical-align:top; overflow-wrap:anywhere; }
+  th { font-size:11.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); font-weight:600;
+       position:sticky; top:0; background:var(--surface-1); z-index:1; }
+  th[data-k] { cursor:pointer; user-select:none; white-space:nowrap; }
+  th[data-k]:hover { color:var(--text-primary); }
+  th .arw { opacity:.45; font-size:10px; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  tbody tr:hover { background:var(--wash); }
+  .tag { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-secondary); white-space:nowrap; }
+  .tag .sw { width:8px; height:8px; }
+  .tblbox { max-height:520px; overflow:auto; border:1px solid var(--border); border-radius:10px; }
+  .tblbox table { min-width:640px; }
+  .cnt { font-size:12.5px; color:var(--muted); margin-top:10px; }
+
+  ul.rev { list-style:none; padding:0; margin:0; }
+  ul.rev li { padding:11px 0; border-bottom:1px solid var(--grid); font-size:13.5px; display:flex; gap:12px; flex-wrap:wrap; }
+  ul.rev li:last-child { border-bottom:0; }
+  ul.rev .amt { font-variant-numeric:tabular-nums; font-weight:600; min-width:90px; text-align:right; }
+  ul.rev .why { flex:1 1 260px; color:var(--muted); font-size:12.5px; }
+  ul.rev .nm { flex:1 1 180px; }
+  .empty { color:var(--muted); font-size:13px; padding:6px 0; }
+
+  #tip {
+    position:fixed; pointer-events:none; opacity:0; transition:opacity .1s;
+    background:var(--surface-1); border:1px solid var(--border); border-radius:9px;
+    padding:8px 11px; font-size:12.5px; box-shadow:0 6px 22px rgba(0,0,0,.16); z-index:50;
+    max-width:230px;
+  }
+  #tip .t { font-weight:600; margin-bottom:2px; }
+  #tip .v { font-variant-numeric:tabular-nums; color:var(--text-secondary); }
+
+  footer { color:var(--muted); font-size:12px; text-align:center; margin-top:28px; line-height:1.7; }
+  .hidden { display:none !important; }
+  @media (prefers-reduced-motion:reduce){ * { transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Account statement report</h1>
+    <div class="sub" id="acctLine"></div>
+  </header>
+
+  <div class="banner" id="banner">
+    <span class="ic">&#9888;</span>
+    <div id="bannerText"></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi hero">
+      <div class="lab">Spend (excl. transfers &amp; investments)</div>
+      <div class="val" id="kpiSpend"></div>
+      <div class="note" id="kpiSpendNote"></div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Total outflow</div>
+      <div class="val sm" id="kpiOutflow"></div>
+      <div class="note">every debit, all categories</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Invested</div>
+      <div class="val sm" id="kpiInvested"></div>
+      <div class="note">SIP / broker mandates</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Avg. daily spend</div>
+      <div class="val sm" id="kpiAvgDaily"></div>
+      <div class="note" id="kpiAvgDailyNote"></div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Closing balance</div>
+      <div class="val sm" id="kpiClose"></div>
+      <div class="note" id="kpiCloseNote"></div>
+    </div>
+  </div>
+
+  <div class="row2">
+    <section class="card">
+      <h2>Where the money went</h2>
+      <p class="cap" id="donutcap"></p>
+      <div class="donutwrap">
+        <svg id="donut" width="196" height="196" viewBox="0 0 196 196" role="img" aria-label="Category share of spending"></svg>
+        <div class="legend" id="donutlgd"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Category totals</h2>
+      <p class="cap">Every category at full precision — the ranked view the donut rounds off. Self transfers
+        and investment mandates are shown here too; neither is consumption.</p>
+      <div class="scroller"><svg id="bars" role="img" aria-label="Spend by category, ranked"></svg></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Daily outflow</h2>
+    <p class="cap" id="dailycap"></p>
+    <div class="scroller"><svg id="daily" role="img" aria-label="Total debits per day"></svg></div>
+  </section>
+
+  <section class="card">
+    <h2>Month split</h2>
+    <p class="cap">Partial months are not comparable — treat this as a windowed total, not a trend.</p>
+    <div class="scroller"><table>
+      <thead><tr><th>Month</th><th class="num">Debits</th><th class="num">Credits</th><th class="num">Net</th></tr></thead>
+      <tbody id="monthbody"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>Needs your review</h2>
+    <p class="cap" id="reviewcap"></p>
+    <ul class="rev" id="revlist"></ul>
+  </section>
+
+  <section class="card">
+    <h2>Top 10 transactions</h2>
+    <p class="cap">Largest single debits in the period.</p>
+    <div class="scroller"><table class="wide">
+      <thead><tr><th>Date</th><th>Description</th><th>Category</th><th class="num">Amount</th></tr></thead>
+      <tbody id="topbody"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>All transactions</h2>
+    <p class="cap">Search any field, or click a column heading to sort. This table is the accessible twin of
+      every chart above — each value is readable here without relying on colour.</p>
+    <div class="tbar">
+      <input type="search" id="q" placeholder="Search description or category…" aria-label="Search transactions">
+      <select id="catf" aria-label="Filter by category"><option value="">All categories</option></select>
+    </div>
+    <div class="tblbox">
+      <table>
+        <thead><tr>
+          <th data-k="date">Date <span class="arw">▲</span></th>
+          <th data-k="desc">Description <span class="arw"></span></th>
+          <th data-k="cat">Category <span class="arw"></span></th>
+          <th data-k="debit" class="num">Debit <span class="arw"></span></th>
+          <th data-k="credit" class="num">Credit <span class="arw"></span></th>
+          <th data-k="balance" class="num">Balance <span class="arw"></span></th>
+        </tr></thead>
+        <tbody id="txnbody"></tbody>
+      </table>
+    </div>
+    <div class="cnt" id="cnt"></div>
+  </section>
+
+  <footer>
+    Contains confidential financial data — for personal use only.<br>
+    Account and reference numbers are masked to their last 4 characters. Categories are assigned by keyword
+    rules plus a local LLM for ambiguous cases — a best effort, not an audit.
+  </footer>
+</div>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+const DATA = __DATA__;
+document.title = 'Statement report — ' + DATA.account;
+
+const SERIES = ['--s1','--s2','--s3','--s4','--s5'];
+const OTHER = '--s6';
+
+const COLOUR = {};                                   // colour follows the entity, assigned once
+DATA.categories.slice(0, SERIES.length).forEach((c, i) => COLOUR[c.cat] = SERIES[i]);
+const OTHER_CATS = new Set(DATA.categories.slice(SERIES.length).map(c => c.cat));
+const catColour = cat => COLOUR[cat] || OTHER;
+
+const cv = n => '₹' + n.toLocaleString('en-IN', {maximumFractionDigits:0});
+const cv2 = n => '₹' + n.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- header / banner / KPIs — all derived from DATA, nothing hardcoded ---------- */
+document.getElementById('acctLine').textContent =
+  'Account ' + DATA.account + ' · ' + DATA.period + ' · ' + DATA.n_txn + ' transactions over ' + DATA.span_days + ' days';
+
+(function renderBanner() {
+  const parts = [];
+  parts.push('Balance moved from <b>' + cv2(DATA.opening_balance) + '</b> to <b>' + cv2(DATA.closing_balance) + '</b>.');
+
+  const nonSpend = DATA.self_transfers + DATA.investments;
+  if (nonSpend > 0) {
+    const bits = [];
+    if (DATA.self_transfers > 0) bits.push(cv2(DATA.self_transfers) + ' moved to your own linked account(s)');
+    if (DATA.investments > 0) bits.push(cv2(DATA.investments) + ' went to investment mandates');
+    parts.push('<b>' + bits.join(' and ') + '</b> — neither is consumption, so the "Spend" figure excludes both.');
+  }
+
+  if (DATA.income > 0) {
+    parts.push('Income was ' + cv2(DATA.income) + ' against ' + cv2(DATA.outflow) + ' outflow — ' +
+      (DATA.savings_rate === null ? 'savings rate not computable.' :
+        'net ' + (DATA.net >= 0 ? 'savings' : 'shortfall') + ' of ' + cv2(Math.abs(DATA.net)) +
+        ' (' + DATA.savings_rate + '% of income).'));
+  } else {
+    parts.push('No credits landed in this window, so income is ₹0 and a savings rate cannot be computed — it would divide by zero.');
+  }
+
+  document.getElementById('bannerText').innerHTML = parts.join(' ');
+})();
+
+document.getElementById('kpiSpend').textContent = cv(DATA.true_spend);
+document.getElementById('kpiSpendNote').textContent =
+  (DATA.outflow ? (DATA.true_spend / DATA.outflow * 100).toFixed(0) : '0') + '% of total outflow';
+document.getElementById('kpiOutflow').textContent = cv(DATA.outflow);
+document.getElementById('kpiInvested').textContent = cv(DATA.investments);
+document.getElementById('kpiAvgDaily').textContent = cv(DATA.avg_daily_spend);
+document.getElementById('kpiAvgDailyNote').textContent =
+  'over ' + DATA.span_days + ' days · ≈ ' + cv(DATA.avg_daily_spend * 30) + '/30d';
+document.getElementById('kpiClose').textContent = cv(DATA.closing_balance);
+document.getElementById('kpiCloseNote').textContent =
+  'income ' + cv(DATA.income) + ' · savings rate ' + (DATA.savings_rate === null ? 'n/a' : DATA.savings_rate + '%');
+
+document.getElementById('reviewcap').textContent = DATA.review.length
+  ? DATA.review.length + ' transaction' + (DATA.review.length === 1 ? '' : 's') +
+    ' could not be classified with confidence by the rules or the local model. They are counted in the ' +
+    'totals under a best guess — correct them yourself rather than trusting the tag.'
+  : 'Every transaction was classified with high confidence — nothing needs a second look.';
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById('tip');
+function showTip(e, title, val) {
+  tip.innerHTML = '<div class="t">' + esc(title) + '</div><div class="v">' + esc(val) + '</div>';
+  tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect();
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+  if (y + r.height > innerHeight - 8) y = e.clientY - r.height - 14;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+const hideTip = () => tip.style.opacity = 0;
+function bindTip(el, title, val) {
+  el.addEventListener('mousemove', e => showTip(e, title, val));
+  el.addEventListener('mouseleave', hideTip);
+  el.setAttribute('tabindex', '0');
+  el.addEventListener('focus', () => {
+    const b = el.getBoundingClientRect();
+    showTip({clientX: b.left + b.width/2, clientY: b.top}, title, val);
+  });
+  el.addEventListener('blur', hideTip);
+}
+
+/* ---------- donut: 5 named slots + one Other, arcs in slot order ---------- */
+function donutSlices() {
+  const total = DATA.outflow;
+  const named = DATA.categories.filter(c => !OTHER_CATS.has(c.cat))
+                               .map(c => ({name: c.cat, amt: c.amt, col: COLOUR[c.cat]}));
+  const rest = DATA.categories.filter(c => OTHER_CATS.has(c.cat));
+  if (rest.length === 1) named.push({name: rest[0].cat, amt: rest[0].amt, col: OTHER});
+  else if (rest.length > 1)
+    named.push({name: 'Other (' + rest.length + ' categories)', amt: rest.reduce((a, c) => a + c.amt, 0), col: OTHER});
+  return {slices: named, total};
+}
+
+function drawDonut() {
+  const {slices, total} = donutSlices();
+  const svg = document.getElementById('donut');
+  if (!total) { svg.innerHTML = ''; document.getElementById('donutlgd').innerHTML = ''; document.getElementById('donutcap').textContent = 'No outflow in this period.'; return; }
+  const R = 84, r = 54, cx = 98, cy = 98, GAP = 2;
+  svg.innerHTML = '';
+  const NS = 'http://www.w3.org/2000/svg';
+  let a0 = -Math.PI / 2;
+
+  slices.forEach(s => {
+    const sweep = s.amt / total * Math.PI * 2;
+    const gapA = Math.min(GAP / R, sweep * 0.35);
+    const a = a0 + gapA / 2, b = a0 + sweep - gapA / 2;
+    const p = document.createElementNS(NS, 'path');
+    const big = (b - a) > Math.PI ? 1 : 0;
+    const P = (rad, ang) => [cx + rad * Math.cos(ang), cy + rad * Math.sin(ang)];
+    const [x1,y1] = P(R,a), [x2,y2] = P(R,b), [x3,y3] = P(r,b), [x4,y4] = P(r,a);
+    p.setAttribute('d', `M${x1} ${y1}A${R} ${R} 0 ${big} 1 ${x2} ${y2}L${x3} ${y3}A${r} ${r} 0 ${big} 0 ${x4} ${y4}Z`);
+    p.setAttribute('fill', css(s.col));
+    p.style.cursor = 'default';
+    bindTip(p, s.name, cv2(s.amt) + '  ·  ' + (s.amt / total * 100).toFixed(1) + '%');
+    svg.appendChild(p);
+    a0 += sweep;
+  });
+
+  const t1 = document.createElementNS(NS, 'text');
+  t1.setAttribute('x', cx); t1.setAttribute('y', cy - 4);
+  t1.setAttribute('text-anchor', 'middle'); t1.setAttribute('fill', css('--text-primary'));
+  t1.setAttribute('font-size', '19'); t1.setAttribute('font-weight', '600');
+  t1.textContent = cv(total);
+  const t2 = document.createElementNS(NS, 'text');
+  t2.setAttribute('x', cx); t2.setAttribute('y', cy + 14);
+  t2.setAttribute('text-anchor', 'middle'); t2.setAttribute('fill', css('--muted'));
+  t2.setAttribute('font-size', '11.5');
+  t2.textContent = 'total outflow';
+  svg.append(t1, t2);
+
+  document.getElementById('donutlgd').innerHTML = slices.map(s =>
+    `<div class="lgd"><span class="sw" style="background:var(${s.col})"></span>` +
+    `<span class="nm">${esc(s.name)}</span><span class="amt">${cv(s.amt)}</span>` +
+    `<span class="pc">${(s.amt / total * 100).toFixed(1)}%</span></div>`).join('');
+
+  const nonSpendPct = total ? (DATA.self_transfers + DATA.investments) / total * 100 : 0;
+  document.getElementById('donutcap').textContent =
+    'Share of every debit in the period — ' + slices.length +
+    ' segments, the smallest categories folded into Other.' +
+    (nonSpendPct > 15 ? ' ' + nonSpendPct.toFixed(0) + '% of it is self-transfers and investments, not spending.' : '');
+}
+
+/* ---------- ranked bars: one series, one hue ---------- */
+function drawBars() {
+  const cats = DATA.categories, total = DATA.outflow;
+  const svg = document.getElementById('bars');
+  if (!cats.length) { svg.innerHTML = ''; return; }
+  const NS = 'http://www.w3.org/2000/svg';
+  const rowH = 30, padL = 150, padR = 118, W = 560, H = cats.length * rowH + 8;
+  const max = Math.max(...cats.map(c => c.amt));
+  const bw = W - padL - padR;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('height', H);
+  svg.style.width = '100%'; svg.style.maxWidth = W + 'px'; svg.style.minWidth = '460px';
+  svg.innerHTML = '';
+
+  cats.forEach((c, i) => {
+    const y = i * rowH + 4, h = 15;
+    const w = Math.max(c.amt / max * bw, 2);
+
+    const lb = document.createElementNS(NS, 'text');
+    lb.setAttribute('x', padL - 10); lb.setAttribute('y', y + h - 2);
+    lb.setAttribute('text-anchor', 'end'); lb.setAttribute('font-size', '12');
+    lb.setAttribute('fill', css('--text-secondary'));
+    lb.textContent = c.cat;
+
+    const p = document.createElementNS(NS, 'path');
+    const rr = Math.min(4, w);
+    p.setAttribute('d', `M${padL} ${y}h${w - rr}a${rr} ${rr} 0 0 1 ${rr} ${rr}v${h - 2*rr}a${rr} ${rr} 0 0 1 ${-rr} ${rr}h${-(w - rr)}z`);
+    p.setAttribute('fill', css('--s1'));
+    bindTip(p, c.cat, cv2(c.amt) + '  ·  ' + c.n + ' txn  ·  ' + (c.amt / total * 100).toFixed(1) + '%');
+
+    const vl = document.createElementNS(NS, 'text');
+    vl.setAttribute('x', padL + w + 8); vl.setAttribute('y', y + h - 2);
+    vl.setAttribute('font-size', '11.5'); vl.setAttribute('fill', css('--text-secondary'));
+    vl.setAttribute('font-weight', '600');
+    vl.textContent = cv(c.amt) + ' · ' + (c.amt / total * 100).toFixed(1) + '%';
+
+    svg.append(lb, p, vl);
+  });
+
+  const base = document.createElementNS(NS, 'line');
+  base.setAttribute('x1', padL); base.setAttribute('x2', padL);
+  base.setAttribute('y1', 0); base.setAttribute('y2', H - 4);
+  base.setAttribute('stroke', css('--axis')); base.setAttribute('stroke-width', '1');
+  svg.appendChild(base);
+}
+
+/* ---------- daily columns ---------- */
+function drawDaily() {
+  const d = DATA.daily;
+  const svg = document.getElementById('daily');
+  if (!d.length) { svg.innerHTML = ''; document.getElementById('dailycap').textContent = 'No outflow in this period.'; return; }
+  const NS = 'http://www.w3.org/2000/svg';
+  const W = Math.max(1000, d.length * 80), padL = 62, padR = 20, padT = 22, plotH = 190, axisH = 26;
+  const H = padT + plotH + axisH;
+  const max = Math.max(...d.map(x => x.amt), 1);
+  const ticks = 4, step = niceStep(max / ticks);
+  const top = Math.ceil(max / step) * step;
+  const bw = (W - padL - padR) / d.length;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.style.minWidth = W + 'px';
+  svg.innerHTML = '';
+  const y = v => padT + plotH - (v / top) * plotH;
+
+  for (let t = 0; t <= top + 1e-6; t += step) {
+    const ln = document.createElementNS(NS, 'line');
+    ln.setAttribute('x1', padL); ln.setAttribute('x2', W - padR);
+    ln.setAttribute('y1', y(t)); ln.setAttribute('y2', y(t));
+    ln.setAttribute('stroke', t === 0 ? css('--axis') : css('--grid'));
+    ln.setAttribute('stroke-width', '1');
+    const tx = document.createElementNS(NS, 'text');
+    tx.setAttribute('x', padL - 9); tx.setAttribute('y', y(t) + 4);
+    tx.setAttribute('text-anchor', 'end'); tx.setAttribute('font-size', '11');
+    tx.setAttribute('fill', css('--muted'));
+    tx.style.fontVariantNumeric = 'tabular-nums';
+    tx.textContent = t >= 1000 ? (t / 1000) + 'k' : t;
+    svg.append(ln, tx);
+  }
+
+  d.forEach((x, i) => {
+    const w = Math.min(24, bw - 14);
+    const cx = padL + i * bw + bw / 2 - w / 2;
+    const h = Math.max((x.amt / top) * plotH, 2), yy = y(x.amt), rr = Math.min(4, w / 2, h);
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', `M${cx} ${yy + h}v${-(h - rr)}a${rr} ${rr} 0 0 1 ${rr} ${-rr}h${w - 2*rr}a${rr} ${rr} 0 0 1 ${rr} ${rr}v${h - rr}z`);
+    p.setAttribute('fill', css('--s1'));
+
+    const hit = document.createElementNS(NS, 'rect');
+    hit.setAttribute('x', padL + i * bw); hit.setAttribute('y', padT);
+    hit.setAttribute('width', bw); hit.setAttribute('height', plotH);
+    hit.setAttribute('fill', 'transparent');
+    bindTip(hit, x.label, cv2(x.amt));
+
+    const lb = document.createElementNS(NS, 'text');
+    lb.setAttribute('x', padL + i * bw + bw / 2); lb.setAttribute('y', padT + plotH + 18);
+    lb.setAttribute('text-anchor', 'middle'); lb.setAttribute('font-size', '11');
+    lb.setAttribute('fill', css('--muted'));
+    lb.textContent = x.label;
+    svg.append(p, lb, hit);
+  });
+
+  const peak = d.reduce((a, b) => a.amt > b.amt ? a : b);
+  const pi = d.indexOf(peak);
+  const pl = document.createElementNS(NS, 'text');
+  pl.setAttribute('x', padL + pi * bw + bw / 2); pl.setAttribute('y', y(peak.amt) - 7);
+  pl.setAttribute('text-anchor', 'middle'); pl.setAttribute('font-size', '11.5');
+  pl.setAttribute('font-weight', '600'); pl.setAttribute('fill', css('--text-secondary'));
+  pl.textContent = cv(peak.amt);
+  svg.appendChild(pl);
+
+  const restTotal = d.reduce((s, x) => s + x.amt, 0) - peak.amt;
+  const restAvg = d.length > 1 ? restTotal / (d.length - 1) : 0;
+  const outlier = restAvg > 0 && peak.amt > restAvg * 3;
+  document.getElementById('dailycap').textContent =
+    'Every debit, by day. Peak is ' + peak.label + ' at ' + cv2(peak.amt) +
+    (outlier ? ' — well above the other days, likely a few large one-off transactions rather than routine spending.' : '.');
+}
+function niceStep(x) {
+  const p = Math.pow(10, Math.floor(Math.log10(x)));
+  const n = x / p;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p;
+}
+
+/* ---------- tables ---------- */
+document.getElementById('monthbody').innerHTML = DATA.monthly.length
+  ? DATA.monthly.map(m =>
+      `<tr><td>${esc(m.month)}</td><td class="num">${cv2(m.spend)}</td><td class="num">${cv2(m.income)}</td>` +
+      `<td class="num">${cv2(m.spend - m.income)}</td></tr>`).join('')
+  : '<tr><td colspan="4" class="empty">No transactions.</td></tr>';
+
+document.getElementById('topbody').innerHTML = DATA.top10.length
+  ? DATA.top10.map(t =>
+      `<tr><td>${esc(t.day)}</td><td>${esc(t.desc)}</td>` +
+      `<td><span class="tag"><span class="sw" style="background:var(${catColour(t.cat)})"></span>${esc(t.cat)}</span></td>` +
+      `<td class="num">${cv2(t.debit)}</td></tr>`).join('')
+  : '<tr><td colspan="4" class="empty">No debits.</td></tr>';
+
+document.getElementById('revlist').innerHTML = DATA.review.length
+  ? DATA.review.map(t =>
+      `<li><span class="nm"><b>${esc(t.desc)}</b><br><span style="color:var(--muted);font-size:12px">` +
+      `${esc(t.day)} · filed under ${esc(t.cat)}</span></span>` +
+      `<span class="why">${esc(t.note)}</span>` +
+      `<span class="amt">${cv2(t.debit)}</span></li>`).join('')
+  : '<li class="empty">Nothing to review.</li>';
+
+const cats = [...new Set(DATA.txns.map(t => t.cat))].sort();
+document.getElementById('catf').innerHTML +=
+  cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+
+let sortK = 'date', sortD = 1;
+function renderTxns() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const cf = document.getElementById('catf').value;
+  let rows = DATA.txns.filter(t =>
+    (!cf || t.cat === cf) && (!q || (t.desc + ' ' + t.cat + ' ' + t.day).toLowerCase().includes(q)));
+  rows = rows.slice().sort((a, b) => {
+    const x = a[sortK], y = b[sortK];
+    return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * sortD;
+  });
+  document.getElementById('txnbody').innerHTML = rows.length ? rows.map(t => {
+    const sw = `<span class="sw" style="background:var(${catColour(t.cat)})"></span>`;
+    return `<tr><td>${esc(t.day)}</td><td>${esc(t.desc)}</td>` +
+      `<td><span class="tag">${sw}${esc(t.cat)}</span></td>` +
+      `<td class="num">${t.debit ? cv2(t.debit) : '—'}</td>` +
+      `<td class="num">${t.credit ? cv2(t.credit) : '—'}</td>` +
+      `<td class="num">${cv2(t.balance)}</td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="empty">No matching transactions.</td></tr>';
+  document.getElementById('cnt').textContent =
+    rows.length + ' of ' + DATA.txns.length + ' transactions · ' +
+    cv2(rows.reduce((s, t) => s + t.debit, 0)) + ' in debits shown';
+}
+document.querySelectorAll('th[data-k]').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.k;
+    sortD = (k === sortK) ? -sortD : (k === 'debit' || k === 'credit' || k === 'balance' ? -1 : 1);
+    sortK = k;
+    document.querySelectorAll('th[data-k] .arw').forEach(a => a.textContent = '');
+    th.querySelector('.arw').textContent = sortD === 1 ? '▲' : '▼';
+    renderTxns();
+  });
+});
+document.getElementById('q').addEventListener('input', renderTxns);
+document.getElementById('catf').addEventListener('change', renderTxns);
+
+function redraw() { drawDonut(); drawBars(); drawDaily(); }
+redraw();
+renderTxns();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { redraw(); renderTxns(); });
+addEventListener('resize', () => hideTip());
+</script>
+</body>
+</html>
