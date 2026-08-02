@@ -64,6 +64,11 @@ cp .env.example .env   # adjust if you changed --served-model-name or the port
 
 python scripts/smoketest_vllm.py       # confirm the server + guided decoding work
 python cli.py ../data/expense-csvs/statement.csv --holder-name "Your Name"
+
+Terminal 1
+vllm serve  llm_utils/models/Qwen2.5-3B-Instruct  --served-model-name expense-cat   --port 8000  --max-model-len 4096   --structured-outputs-config.backend xgrammar
+Terminal 2
+python3 cli.py  ../data/expense-csvs/statement.csv --holder-name "Arjit Sharma"
 ```
 
 Report is written to `outputs/statement-report.html` by default (`--output` to
