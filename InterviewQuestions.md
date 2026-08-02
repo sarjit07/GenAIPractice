@@ -1,0 +1,4 @@
+- What LLM apps have you built ? how did you evaluate those apps ?
+- Langgraph checkpoints + memory
+- Agentic system for writing code, units, reviews etc.
+- 
